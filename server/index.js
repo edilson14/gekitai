@@ -11,13 +11,12 @@ io.on("connection", (socket) => {
   console.log(`Total de clients ${clients.length}`);
 
   socket.on("message", (data) => {
-    console.log(`Message received from ${socket.id}: ${data}`);
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("message", `${data}`);
       console.log(`Mensagem Enviada para ${otherClient.id} : ${data}`);
     }
-  });   
+  });
 
   socket.on("board-moviment", (data) => {
     console.log(`Jogada do ${socket.id}: ${data}`);
@@ -29,7 +28,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    const clientIndex = clients.findIndex(
+      (_client) => _client.id === socket.id
+    );
+    clients.splice(clientIndex, 1);
+    console.log(`Client desconectado: ${socket.id}`);
   });
 });
 

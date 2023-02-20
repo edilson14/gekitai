@@ -12,6 +12,7 @@ class GekitaiBoard extends StatefulWidget {
 }
 
 class _GekitaiBoardState extends State<GekitaiBoard> {
+  bool canPlay = true;
   Color? playerColor;
   final Color _currentColor = Colors.grey;
   final List<Color> _cells = List<Color>.filled(36, Colors.grey);
@@ -20,8 +21,16 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
   @override
   void initState() {
-    if (_client.socket.disconnected) _client.connect();
     super.initState();
+    if (_client.socket.disconnected) {
+      _client.connect();
+    } else {
+      final SnackBar snackbar = SnackBar(
+        content: Text(Messages.connected),
+        backgroundColor: Colors.green,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
     _handleComingMessage();
   }
 
@@ -37,6 +46,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         playerColor: playerColor!,
         boardIndex: tapedIndex,
       );
+      _hanldeTurn();
     }
   }
 
@@ -44,11 +54,14 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     _client.socket.on(
       'board-moviment',
       (data) {
+        if (_isNotFirstMoviment()) _hanldeTurn();
         List<dynamic> move =
             data.replaceAll('{', '').replaceAll('}', '').split(':');
-        setState(() {
-          _cells[int.parse(move[1])] = Color(int.parse(move[0]));
-        });
+        setState(
+          () {
+            _cells[int.parse(move[1])] = Color(int.parse(move[0]));
+          },
+        );
       },
     );
   }
@@ -166,6 +179,21 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       return false;
     }
+    if (!canPlay) {
+      final SnackBar snackbar = SnackBar(
+        content: Text(
+          Messages.waitYourTurn,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.yellow,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return false;
+    }
+
     if (playersPieces.isEmpty) return false;
     if (_cells[tapedIndex].toString() != Colors.grey.toString()) {
       final SnackBar snackbar = SnackBar(
@@ -177,5 +205,15 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     }
 
     return true;
+  }
+
+  void _hanldeTurn() {
+    setState(() {
+      canPlay = !canPlay;
+    });
+  }
+
+  bool _isNotFirstMoviment() {
+    return _cells.any((cell) => cell.value != Colors.grey.value);
   }
 }
