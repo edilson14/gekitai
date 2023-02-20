@@ -17,7 +17,7 @@ io.on("connection", (socket) => {
       otherClient.emit("message", `${data}`);
       console.log(`Mensagem Enviada para ${otherClient.id} : ${data}`);
     }
-  });
+  });   
 
   socket.on("board-moviment", (data) => {
     console.log(`Jogada do ${socket.id}: ${data}`);

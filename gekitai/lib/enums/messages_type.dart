@@ -1,1 +1,0 @@
-enum Messagestypes { enviada, recebida }

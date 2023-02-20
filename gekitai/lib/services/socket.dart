@@ -23,7 +23,7 @@ class SocketClient {
   }
 
   sendBoardMove({required Color playerColor, required int boardIndex}) {
-    Map<Color, int> playerMove = {playerColor: boardIndex};
+    Map<int, int> playerMove = {playerColor.value: boardIndex};
     socket.emit('board-moviment', playerMove.toString());
   }
 

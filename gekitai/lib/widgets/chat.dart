@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:gekitai/enums/socke_types.dart';
 import 'package:gekitai/services/socket.dart';
 
 class ChatClient extends StatefulWidget {
@@ -36,28 +33,34 @@ class _ChatClientState extends State<ChatClient> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: mensagensRecebidas.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(mensagensRecebidas[index]),
-              );
-            },
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey,
         ),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _textController,
-                decoration:
-                    const InputDecoration(hintText: 'Escreva uma mensagem!'),
-              ),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: mensagensRecebidas.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(mensagensRecebidas[index]),
+                );
+              },
             ),
-            TextButton(
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  decoration:
+                      const InputDecoration(hintText: 'Escreva uma mensagem!'),
+                ),
+              ),
+              TextButton(
                 onPressed: () {
                   _client.sendMessage(message: _textController.text);
                   _textController.clear();
@@ -66,10 +69,12 @@ class _ChatClientState extends State<ChatClient> {
                   children: const [
                     Icon(Icons.send),
                   ],
-                )),
-          ],
-        ),
-      ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,11 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:gekitai/enums/socke_types.dart';
+import 'package:gekitai/enums/messages.dart';
 import 'package:gekitai/services/socket.dart';
+import 'package:gekitai/widgets/gekitai_pieces.dart';
 
 class GekitaiBoard extends StatefulWidget {
   const GekitaiBoard({super.key});
@@ -19,6 +16,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   final Color _currentColor = Colors.grey;
   final List<Color> _cells = List<Color>.filled(36, Colors.grey);
   final SocketClient _client = SocketClient();
+  List<GekitaiPiece> playersPieces = [];
 
   @override
   void initState() {
@@ -28,21 +26,30 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _handlePlayerClick({required int tapedIndex}) {
-    setState(
-      () {
-        _cells[tapedIndex] = playerColor!;
-      },
-    );
-    _client.sendBoardMove(
-      playerColor: playerColor!,
-      boardIndex: tapedIndex,
-    );
+    if (_isValidMoviment(tapedIndex: tapedIndex)) {
+      setState(
+        () {
+          _cells[tapedIndex] = playerColor!;
+        },
+      );
+      playersPieces.removeLast();
+      _client.sendBoardMove(
+        playerColor: playerColor!,
+        boardIndex: tapedIndex,
+      );
+    }
   }
 
   void _handleComingMessage() {
     _client.socket.on(
       'board-moviment',
-      (data) {},
+      (data) {
+        List<dynamic> move =
+            data.replaceAll('{', '').replaceAll('}', '').split(':');
+        setState(() {
+          _cells[int.parse(move[1])] = Color(int.parse(move[0]));
+        });
+      },
     );
   }
 
@@ -90,6 +97,11 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
               ),
             ),
           ),
+        Row(
+          children: [
+            ...playersPieces.map((e) => e).toList(),
+          ],
+        )
       ],
     );
   }
@@ -131,8 +143,39 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     ).then((selectedColor) {
       if (selectedColor != null) {
         playerColor = selectedColor;
-        // fazer algo com a cor selecionada
+        setState(
+          () {
+            playersPieces = List.generate(
+              8,
+              (_) => GekitaiPiece(
+                color: selectedColor,
+              ),
+            );
+          },
+        );
       }
     });
+  }
+
+  bool _isValidMoviment({required int tapedIndex}) {
+    if (playerColor == null) {
+      final SnackBar snackbar = SnackBar(
+        content: Text(Messages.selectAColor),
+        backgroundColor: Colors.red,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return false;
+    }
+    if (playersPieces.isEmpty) return false;
+    if (_cells[tapedIndex].toString() != Colors.grey.toString()) {
+      final SnackBar snackbar = SnackBar(
+        content: Text(Messages.invalidMoviment),
+        backgroundColor: Colors.red,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return false;
+    }
+
+    return true;
   }
 }
