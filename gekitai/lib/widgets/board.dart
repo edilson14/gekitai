@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:gekitai/enums/env.dart';
 import 'package:gekitai/enums/messages.dart';
 import 'package:gekitai/services/socket.dart';
 import 'package:gekitai/widgets/gekitai_pieces.dart';
+
+const Color graycolor = Colors.grey;
 
 class GekitaiBoard extends StatefulWidget {
   const GekitaiBoard({super.key});
@@ -14,8 +17,8 @@ class GekitaiBoard extends StatefulWidget {
 class _GekitaiBoardState extends State<GekitaiBoard> {
   bool canPlay = true;
   Color? playerColor;
-  final Color _currentColor = Colors.grey;
-  final List<Color> _cells = List<Color>.filled(36, Colors.grey);
+  final Color _currentColor = graycolor;
+  final List<Color> _cells = List<Color>.filled(36, graycolor);
   final SocketClient _client = SocketClient();
   List<GekitaiPiece> playersPieces = [];
 
@@ -46,6 +49,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         playerColor: playerColor!,
         boardIndex: tapedIndex,
       );
+      _pushPieces(tapedIndex: tapedIndex);
       _hanldeTurn();
     }
   }
@@ -64,6 +68,15 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         );
       },
     );
+
+    _client.socket.on('piece-out-board', (data) {
+      playersPieces.add(
+        GekitaiPiece(
+          color: playerColor!,
+        ),
+      );
+      setState(() {});
+    });
   }
 
   @override
@@ -193,9 +206,10 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
       return false;
     }
-
-    if (playersPieces.isEmpty) return false;
-    if (_cells[tapedIndex].toString() != Colors.grey.toString()) {
+    if (playersPieces.isEmpty) {
+      return false;
+    }
+    if (_cells[tapedIndex].toString() != graycolor.toString()) {
       final SnackBar snackbar = SnackBar(
         content: Text(Messages.invalidMoviment),
         backgroundColor: Colors.red,
@@ -214,6 +228,20 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   bool _isNotFirstMoviment() {
-    return _cells.any((cell) => cell.value != Colors.grey.value);
+    return _cells.any((cell) => cell.value != graycolor.value);
   }
+
+  void _pushPieces({required int tapedIndex}) {
+    if (Env.isOnBorder(tapedIndex)) {
+      print('ok está na borda');
+    } else if (Env.isNearFromBorder(tapedIndex)) {
+      print('indece $tapedIndex');
+      print(Env.getBorderIndexes(tapedIndex));
+      print('perto da borda');
+    } else {
+      print('posição normal');
+    }
+  }
+
+  handlePiceMoviment() {}
 }
