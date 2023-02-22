@@ -33,9 +33,11 @@ class SocketClient {
     socket.emit('give-up', playerColor.toString());
   }
 
-  playerPieceMovedOut() {
-    socket.emit(
-      'piece-out-board',
-    );
+  playerPieceMovedOut({
+    required int piecePosition,
+    required int colorValue,
+  }) {
+    final socketData = {piecePosition, colorValue};
+    socket.emit('piece-out-board', socketData.toString());
   }
 }

@@ -8,22 +8,28 @@ const clients = [];
 
 io.on("connection", (socket) => {
   if (clients.length < 2) clients.push(socket);
-  console.log(`Total de clients ${clients.length}`);
 
   socket.on("message", (data) => {
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("message", `${data}`);
-      console.log(`Mensagem Enviada para ${otherClient.id} : ${data}`);
     }
   });
 
   socket.on("board-moviment", (data) => {
-    console.log(`Jogada do ${socket.id}: ${data}`);
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("board-moviment", `${data}`);
-      console.log(`Jogada Enviada ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Peça movida para fora do tabuleiro
+  socket.on("piece-out-board", (data) => {
+    console.log(`Peça para fora ${socket.id}: ${data}`);
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("piece-out-board", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
     }
   });
 

@@ -70,11 +70,17 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
 
     _client.socket.on('piece-out-board', (data) {
-      playersPieces.add(
-        GekitaiPiece(
-          color: playerColor!,
-        ),
-      );
+      data = data.replaceAll('{', '').replaceAll('}', '').split(',');
+      final int color = int.parse(data[1]);
+      final int boardPosition = int.parse(data[0].toString().trim());
+      _cells[boardPosition] = graycolor;
+      if (color == playerColor!.value) {
+        playersPieces.add(
+          GekitaiPiece(
+            color: playerColor!,
+          ),
+        );
+      }
       setState(() {});
     });
   }
@@ -235,13 +241,28 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     if (Env.isOnBorder(tapedIndex)) {
       print('ok está na borda');
     } else if (Env.isNearFromBorder(tapedIndex)) {
-      print('indece $tapedIndex');
-      print(Env.getBorderIndexes(tapedIndex));
-      print('perto da borda');
+      final List<int> borders = Env.getBorderIndexes(tapedIndex);
+      for (var element in borders) {
+        handlePiceOut(position: element);
+      }
     } else {
       print('posição normal');
     }
   }
 
-  handlePiceMoviment() {}
+  handlePiceOut({required int position}) {
+    if (_cells[position].value == playerColor!.value) {
+      playersPieces.add(
+        GekitaiPiece(
+          color: playerColor,
+        ),
+      );
+    }
+    _client.playerPieceMovedOut(
+      piecePosition: position,
+      colorValue: _cells[position].value,
+    );
+    _cells[position] = graycolor;
+    setState(() {});
+  }
 }
