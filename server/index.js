@@ -25,10 +25,27 @@ io.on("connection", (socket) => {
 
   // Peça movida para fora do tabuleiro
   socket.on("piece-out-board", (data) => {
-    console.log(`Peça para fora ${socket.id}: ${data}`);
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("piece-out-board", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Jogador solicitou a desistencia
+  socket.on("give-up", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("give-up", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Jogador aceitou a desistencia
+  socket.on("acept-give-up", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("acept-give-up", `${data}`);
       console.log(`Peça para fora ${otherClient.id} : ${data}`);
     }
   });

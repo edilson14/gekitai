@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gekitai/enums/env.dart';
@@ -69,20 +71,42 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       },
     );
 
-    _client.socket.on('piece-out-board', (data) {
-      data = data.replaceAll('{', '').replaceAll('}', '').split(',');
-      final int color = int.parse(data[1]);
-      final int boardPosition = int.parse(data[0].toString().trim());
-      _cells[boardPosition] = graycolor;
-      if (color == playerColor!.value) {
-        playersPieces.add(
-          GekitaiPiece(
-            color: playerColor!,
-          ),
+    _client.socket.on(
+      'piece-out-board',
+      (data) {
+        data = data.replaceAll('{', '').replaceAll('}', '').split(',');
+        final int color = int.parse(data[1]);
+        final int boardPosition = int.parse(data[0].toString().trim());
+        _cells[boardPosition] = graycolor;
+        if (color == playerColor!.value) {
+          playersPieces.add(
+            GekitaiPiece(
+              color: playerColor!,
+            ),
+          );
+        }
+        setState(() {});
+      },
+    );
+
+    _client.socket.on(
+      'give-up',
+      (data) {
+        _showGivUpRequest();
+      },
+    );
+
+    _client.socket.on(
+      'acept-give-up',
+      (data) {
+        final SnackBar snackbar = SnackBar(
+          content: Text(Messages.loseByGivingUp),
+          backgroundColor: Colors.red,
         );
-      }
-      setState(() {});
-    });
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+        _resetTheBoard();
+      },
+    );
   }
 
   @override
@@ -133,13 +157,35 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
           children: [
             ...playersPieces.map((e) => e).toList(),
           ],
-        )
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        if (playerColor != null)
+          TextButton(
+            onPressed: () {
+              final SnackBar snackbar = SnackBar(
+                content: Text(
+                  Messages.givUpRequest,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                backgroundColor: Colors.yellowAccent,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+              _client.giveUp(playerColor: playerColor!);
+            },
+            child: const Text('Desistir'),
+          ),
       ],
     );
   }
 
   void _showColorPicker() async {
-    showDialog(
+    showDialog<Color>(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -187,6 +233,51 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         );
       }
     });
+  }
+
+  void _showGivUpRequest() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Desistencia!'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: const [
+                Text('O adversário quer desistir do jogo!'),
+                Text('Caso aceite , você será o  vencedor!')
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white,
+              ),
+              child: const Text('Não Aceitar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+              ),
+              child: const Text(
+                'Aceitar',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                _aceptPlayerGivenUp();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   bool _isValidMoviment({required int tapedIndex}) {
@@ -263,6 +354,31 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       colorValue: _cells[position].value,
     );
     _cells[position] = graycolor;
+    setState(() {});
+  }
+
+  _aceptPlayerGivenUp() {
+    Navigator.of(context).pop();
+    final SnackBar snackbar = SnackBar(
+      content: Text(Messages.winTheGame),
+      backgroundColor: Colors.green,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    _client.socket.emit('acept-give-up');
+    _resetTheBoard();
+  }
+
+  void _resetTheBoard() {
+    for (int index = 0; index < _cells.length; index++) {
+      _cells[index] = graycolor;
+    }
+    playersPieces = [];
+    playersPieces = List.generate(
+      8,
+      (_) => GekitaiPiece(
+        color: playerColor,
+      ),
+    );
     setState(() {});
   }
 }
