@@ -50,6 +50,15 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Jogador aceitou a desistencia
+  socket.on("piece-was-pushed", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("piece-was-pushed", `${data}`);
+      console.log(`Peça empurrada ${otherClient.id} : ${data}`);
+    }
+  });
+
   socket.on("disconnect", () => {
     const clientIndex = clients.findIndex(
       (_client) => _client.id === socket.id

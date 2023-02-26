@@ -52,6 +52,52 @@ class Env {
     return borderIndexes;
   }
 
+  static List<int> getAdjacentIndexes(int index) {
+    List<int> adjacentIndexes = [];
+
+    // verifica se a posição acima existe e adiciona ao array
+    if (index > 5) {
+      adjacentIndexes.add(index - 6);
+
+      // verifica se a posição à esquerda acima existe e adiciona ao array
+      if (index % 6 > 0) {
+        adjacentIndexes.add(index - 7);
+      }
+
+      // verifica se a posição à direita acima existe e adiciona ao array
+      if (index % 6 < 5) {
+        adjacentIndexes.add(index - 5);
+      }
+    }
+
+    // verifica se a posição à esquerda existe e adiciona ao array
+    if (index % 6 > 0) {
+      adjacentIndexes.add(index - 1);
+    }
+
+    // verifica se a posição à direita existe e adiciona ao array
+    if (index % 6 < 5) {
+      adjacentIndexes.add(index + 1);
+    }
+
+    // verifica se a posição abaixo existe e adiciona ao array
+    if (index < 30) {
+      adjacentIndexes.add(index + 6);
+
+      // verifica se a posição à esquerda abaixo existe e adiciona ao array
+      if (index % 6 > 0) {
+        adjacentIndexes.add(index + 5);
+      }
+
+      // verifica se a posição à direita abaixo existe e adiciona ao array
+      if (index % 6 < 5) {
+        adjacentIndexes.add(index + 7);
+      }
+    }
+
+    return adjacentIndexes;
+  }
+
   static bool isOnLeftBorder(int index) {
     return leftBorder.contains(index);
   }

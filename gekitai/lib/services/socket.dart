@@ -40,4 +40,12 @@ class SocketClient {
     final socketData = {piecePosition, colorValue};
     socket.emit('piece-out-board', socketData.toString());
   }
+
+  pieceWasPushed({
+    required int from,
+    required int to,
+  }) {
+    final List<int> moviment = [from, to];
+    socket.emit('piece-was-pushed', moviment.toString());
+  }
 }

@@ -53,6 +53,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       );
       _pushPieces(tapedIndex: tapedIndex);
       _hanldeTurn();
+      _checkWinner();
     }
   }
 
@@ -62,7 +63,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       (data) {
         if (_isNotFirstMoviment()) _hanldeTurn();
         List<dynamic> move =
-            data.replaceAll('{', '').replaceAll('}', '').split(':');
+            data.toString().replaceAll('{', '').replaceAll('}', '').split(':');
         setState(
           () {
             _cells[int.parse(move[1])] = Color(int.parse(move[0]));
@@ -78,7 +79,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         final int color = int.parse(data[1]);
         final int boardPosition = int.parse(data[0].toString().trim());
         _cells[boardPosition] = graycolor;
-        if (color == playerColor!.value) {
+        if (color == playerColor?.value) {
           playersPieces.add(
             GekitaiPiece(
               color: playerColor!,
@@ -105,6 +106,21 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         );
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
         _resetTheBoard();
+      },
+    );
+
+    _client.socket.on(
+      'piece-was-pushed',
+      (data) {
+        final List<String> positions =
+            data.toString().replaceAll('[', '').replaceAll(']', '').split(',');
+        int from = int.parse(positions[0]);
+        int to = int.parse(positions[1]);
+
+        final Color currentColor = _cells[from];
+        _cells[from] = graycolor;
+        _cells[to] = currentColor;
+        setState(() {});
       },
     );
   }
@@ -329,29 +345,20 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _pushPieces({required int tapedIndex}) {
-    if (Env.isOnBorder(tapedIndex)) {
-      print('ok está na borda');
-    } else if (Env.isNearFromBorder(tapedIndex)) {
-      final List<int> borders = Env.getBorderIndexes(tapedIndex);
-      for (var element in borders) {
-        handlePiceOut(position: element);
-      }
-    } else {
-      print('posição normal');
-    }
+    List<int> adjecens = handleAdjecenyIndexes(tapedIndex: tapedIndex);
   }
 
-  handlePiceOut({required int position}) {
-    if (_cells[position].value == playerColor!.value) {
+  handlePieceOut({required int position, required Color color}) {
+    if (playerColor?.value == color.value) {
       playersPieces.add(
         GekitaiPiece(
-          color: playerColor,
+          color: color,
         ),
       );
     }
     _client.playerPieceMovedOut(
       piecePosition: position,
-      colorValue: _cells[position].value,
+      colorValue: color.value,
     );
     _cells[position] = graycolor;
     setState(() {});
@@ -364,7 +371,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       backgroundColor: Colors.green,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    _client.socket.emit('acept-give-up');
+    _client.socket.emit('acept-give-up', 1);
     _resetTheBoard();
   }
 
@@ -380,5 +387,191 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       ),
     );
     setState(() {});
+  }
+
+  _checkWinner() {
+    // Check rows
+    for (int row = 0; row < 6; row++) {
+      int start = row * 6;
+      for (int col = 0; col < 4; col++) {
+        int pos = start + col;
+        if (_cells[pos] == playerColor &&
+            _cells[pos] == _cells[pos + 1] &&
+            _cells[pos] == _cells[pos + 2]) {
+          print(pos);
+          return _cells[pos];
+        }
+      }
+    }
+
+    // Check columns
+    for (int col = 0; col < 6; col++) {
+      for (int row = 0; row < 4; row++) {
+        int pos = row * 6 + col;
+        if (_cells[pos] == playerColor &&
+            _cells[pos] == _cells[pos + 6] &&
+            _cells[pos] == _cells[pos + 12]) {
+          print(pos);
+          return _cells[pos];
+        }
+      }
+    }
+
+    // Check diagonals
+    for (int row = 0; row < 4; row++) {
+      for (int col = 0; col < 4; col++) {
+        int pos = row * 6 + col;
+        if (_cells[pos] == playerColor &&
+            _cells[pos] == _cells[pos + 7] &&
+            _cells[pos] == _cells[pos + 14]) {
+          print(pos);
+          return _cells[pos];
+        }
+      }
+    }
+    for (int row = 0; row < 4; row++) {
+      for (int col = 2; col < 6; col++) {
+        int pos = row * 6 + col;
+        if (_cells[pos] == playerColor &&
+            _cells[pos] == _cells[pos + 5] &&
+            _cells[pos] == _cells[pos + 10]) {
+          print(pos);
+          return _cells[pos];
+        }
+      }
+    }
+
+    return 0; // No winner
+  }
+
+  List<int> handleAdjecenyIndexes({required int tapedIndex}) {
+    List<int> adjacentIndexes = [];
+
+    // verifica se a posição acima existe e adiciona ao array
+    if (tapedIndex > 5) {
+      adjacentIndexes.add(tapedIndex - 6);
+      int pushedIndex = tapedIndex - 12;
+      final Color currentColor = _cells[tapedIndex - 6];
+
+      if (pushedIndex >= 0 && pushedIndex <= 35) {
+        if (_cells[tapedIndex - 6] != graycolor &&
+            _cells[tapedIndex - 12] == graycolor) {
+          _cells[tapedIndex - 6] = graycolor;
+          _cells[tapedIndex - 12] = currentColor;
+          _client.pieceWasPushed(from: tapedIndex - 6, to: tapedIndex - 12);
+        }
+      } else {
+        handlePieceOut(
+          position: tapedIndex - 6,
+          color: currentColor,
+        );
+      }
+
+      // verifica se a posição à esquerda acima existe e adiciona ao array
+      if (tapedIndex % 6 > 0) {
+        adjacentIndexes.add(tapedIndex - 7);
+        int pushedIndex = tapedIndex - 14;
+
+        if (pushedIndex >= 0 && pushedIndex <= 35) {
+          if (_cells[tapedIndex - 7] != graycolor &&
+              _cells[tapedIndex - 14] == graycolor) {
+            final Color currentColor = _cells[tapedIndex - 7];
+            _cells[tapedIndex - 7] = graycolor;
+
+            if (Env.isOnBorder(tapedIndex - 7)) {
+              handlePieceOut(position: tapedIndex - 7, color: currentColor);
+            } else {
+              // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+              _cells[tapedIndex - 14] = currentColor;
+              _client.pieceWasPushed(from: tapedIndex - 7, to: tapedIndex - 14);
+            }
+          }
+        } else {
+          handlePieceOut(
+            position: tapedIndex - 7,
+            color: _cells[tapedIndex - 7],
+          );
+        }
+      }
+
+      // verifica se a posição à direita acima existe e adiciona ao array
+      if (tapedIndex % 6 < 5) {
+        adjacentIndexes.add(tapedIndex - 5);
+
+        int pushedIndex = tapedIndex - 10;
+
+        if (pushedIndex >= 0 && pushedIndex <= 35) {
+          if (Env.rightBorder.contains(tapedIndex - 5)) {
+            handlePieceOut(position: tapedIndex - 5, color: currentColor);
+          } else if (_cells[tapedIndex - 5] != graycolor &&
+              _cells[tapedIndex - 10] == graycolor) {
+            final Color currentColor = _cells[tapedIndex - 5];
+            _cells[tapedIndex - 5] = graycolor;
+
+            //  else {
+            // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+            _cells[tapedIndex - 10] = currentColor;
+            _client.pieceWasPushed(from: tapedIndex - 5, to: tapedIndex - 10);
+            // }
+          }
+        } else {
+          handlePieceOut(
+            position: tapedIndex - 5,
+            color: _cells[tapedIndex - 5],
+          );
+        }
+      }
+    }
+
+    // verifica se a posição à esquerda existe e adiciona ao array
+    if (tapedIndex % 6 > 0) {
+      adjacentIndexes.add(tapedIndex - 1);
+      int pushedIndex = tapedIndex - 2;
+
+      if (pushedIndex >= 0 && pushedIndex <= 35) {
+        if (_cells[tapedIndex - 1] != graycolor &&
+            _cells[tapedIndex - 2] == graycolor) {
+          final Color currentColor = _cells[tapedIndex - 1];
+          _cells[tapedIndex - 1] = graycolor;
+
+          if (Env.leftBorder.contains(tapedIndex - 1)) {
+            handlePieceOut(position: tapedIndex - 1, color: currentColor);
+          } else {
+            // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+            _cells[tapedIndex - 2] = currentColor;
+            _client.pieceWasPushed(from: tapedIndex - 1, to: tapedIndex - 2);
+          }
+        }
+      } else {
+        handlePieceOut(
+          position: tapedIndex - 1,
+          color: _cells[tapedIndex - 1],
+        );
+      }
+    }
+
+    // verifica se a posição à direita existe e adiciona ao array
+    if (tapedIndex % 6 < 5) {
+      adjacentIndexes.add(tapedIndex + 1);
+    }
+
+    // verifica se a posição abaixo existe e adiciona ao array
+    if (tapedIndex < 30) {
+      adjacentIndexes.add(tapedIndex + 6);
+
+      // verifica se a posição à esquerda abaixo existe e adiciona ao array
+      if (tapedIndex % 6 > 0) {
+        adjacentIndexes.add(tapedIndex + 5);
+      }
+
+      // verifica se a posição à direita abaixo existe e adiciona ao array
+      if (tapedIndex % 6 < 5) {
+        adjacentIndexes.add(tapedIndex + 7);
+      }
+
+      // return adjacentIndexes;
+    }
+
+    return adjacentIndexes;
   }
 }
