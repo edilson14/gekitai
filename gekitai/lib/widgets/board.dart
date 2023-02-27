@@ -508,11 +508,9 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             final Color currentColor = _cells[tapedIndex - 5];
             _cells[tapedIndex - 5] = graycolor;
 
-            //  else {
             // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
             _cells[tapedIndex - 10] = currentColor;
             _client.pieceWasPushed(from: tapedIndex - 5, to: tapedIndex - 10);
-            // }
           }
         } else {
           handlePieceOut(
@@ -553,20 +551,102 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     // verifica se a posição à direita existe e adiciona ao array
     if (tapedIndex % 6 < 5) {
       adjacentIndexes.add(tapedIndex + 1);
+
+      int pushedIndex = tapedIndex + 2;
+
+      if (pushedIndex >= 0 && pushedIndex <= 35) {
+        if (_cells[tapedIndex + 1] != graycolor &&
+            _cells[tapedIndex + 2] == graycolor) {
+          final Color currentColor = _cells[tapedIndex + 1];
+          _cells[tapedIndex + 1] = graycolor;
+
+          if (Env.rightBorder.contains(tapedIndex + 1)) {
+            handlePieceOut(position: tapedIndex + 1, color: currentColor);
+          } else {
+            // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+            _cells[tapedIndex + 2] = currentColor;
+            _client.pieceWasPushed(from: tapedIndex + 1, to: tapedIndex + 2);
+          }
+        }
+      } else {
+        handlePieceOut(
+          position: tapedIndex + 1,
+          color: _cells[tapedIndex + 1],
+        );
+      }
     }
 
     // verifica se a posição abaixo existe e adiciona ao array
     if (tapedIndex < 30) {
       adjacentIndexes.add(tapedIndex + 6);
+      int pushedIndex = tapedIndex + 12;
+      final Color currentColor = _cells[tapedIndex + 6];
+
+      if (pushedIndex >= 0 && pushedIndex <= 35) {
+        if (_cells[tapedIndex + 6] != graycolor &&
+            _cells[tapedIndex + 12] == graycolor) {
+          _cells[tapedIndex + 6] = graycolor;
+          _cells[tapedIndex + 12] = currentColor;
+          _client.pieceWasPushed(from: tapedIndex + 6, to: tapedIndex + 12);
+        }
+      } else {
+        handlePieceOut(
+          position: tapedIndex + 6,
+          color: currentColor,
+        );
+      }
 
       // verifica se a posição à esquerda abaixo existe e adiciona ao array
       if (tapedIndex % 6 > 0) {
         adjacentIndexes.add(tapedIndex + 5);
+        int pushedIndex = tapedIndex + 10;
+
+        if (pushedIndex >= 0 && pushedIndex <= 35) {
+          if (Env.rightBorder.contains(tapedIndex + 5)) {
+            handlePieceOut(position: tapedIndex + 5, color: currentColor);
+          } else if (_cells[tapedIndex + 5] != graycolor &&
+              _cells[tapedIndex + 10] == graycolor) {
+            final Color currentColor = _cells[tapedIndex + 5];
+            _cells[tapedIndex + 5] = graycolor;
+
+            // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+            _cells[tapedIndex + 10] = currentColor;
+            _client.pieceWasPushed(from: tapedIndex + 5, to: tapedIndex + 10);
+          }
+        } else {
+          handlePieceOut(
+            position: tapedIndex + 5,
+            color: _cells[tapedIndex + 5],
+          );
+        }
       }
 
       // verifica se a posição à direita abaixo existe e adiciona ao array
       if (tapedIndex % 6 < 5) {
         adjacentIndexes.add(tapedIndex + 7);
+
+        int pushedIndex = tapedIndex + 14;
+
+        if (pushedIndex >= 0 && pushedIndex <= 35) {
+          if (_cells[tapedIndex + 7] != graycolor &&
+              _cells[tapedIndex + 14] == graycolor) {
+            final Color currentColor = _cells[tapedIndex + 7];
+            _cells[tapedIndex + 7] = graycolor;
+
+            if (Env.rightBorder.contains(tapedIndex + 7)) {
+              handlePieceOut(position: tapedIndex + 7, color: currentColor);
+            } else {
+              // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
+              _cells[tapedIndex + 14] = currentColor;
+              _client.pieceWasPushed(from: tapedIndex + 7, to: tapedIndex + 14);
+            }
+          }
+        } else {
+          handlePieceOut(
+            position: tapedIndex + 7,
+            color: _cells[tapedIndex + 7],
+          );
+        }
       }
 
       // return adjacentIndexes;
