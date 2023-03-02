@@ -145,10 +145,19 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
                     color: _cells[index],
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(
-                    child: Text(
-                      index.toString(),
-                    ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: CherryBlossomPainter(),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          index.toString(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -296,6 +305,41 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
   }
 
+  void _showVictory() async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vencedor!'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: const [
+                Text('Parabéns, venceu o jogo!'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+              ),
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                _aceptPlayerGivenUp();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   bool _isValidMoviment({required int tapedIndex}) {
     if (playerColor == null) {
       final SnackBar snackbar = SnackBar(
@@ -345,7 +389,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _pushPieces({required int tapedIndex}) {
-    List<int> adjecens = handleAdjecenyIndexes(tapedIndex: tapedIndex);
+    handleAdjecenyIndexes(tapedIndex: tapedIndex);
   }
 
   handlePieceOut({required int position, required Color color}) {
@@ -390,6 +434,10 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   _checkWinner() {
+    // verificar se o jogador ainda possui peças
+
+    if (playersPieces.isEmpty) _showVictory();
+
     // Check rows
     for (int row = 0; row < 6; row++) {
       int start = row * 6;
@@ -398,6 +446,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         if (_cells[pos] == playerColor &&
             _cells[pos] == _cells[pos + 1] &&
             _cells[pos] == _cells[pos + 2]) {
+          _showVictory();
           print(pos);
           return _cells[pos];
         }
@@ -411,6 +460,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         if (_cells[pos] == playerColor &&
             _cells[pos] == _cells[pos + 6] &&
             _cells[pos] == _cells[pos + 12]) {
+          _showVictory();
           print(pos);
           return _cells[pos];
         }
@@ -424,6 +474,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         if (_cells[pos] == playerColor &&
             _cells[pos] == _cells[pos + 7] &&
             _cells[pos] == _cells[pos + 14]) {
+          _showVictory();
           print(pos);
           return _cells[pos];
         }
@@ -435,6 +486,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         if (_cells[pos] == playerColor &&
             _cells[pos] == _cells[pos + 5] &&
             _cells[pos] == _cells[pos + 10]) {
+          _showVictory();
           print(pos);
           return _cells[pos];
         }
@@ -444,12 +496,9 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     return 0; // No winner
   }
 
-  List<int> handleAdjecenyIndexes({required int tapedIndex}) {
-    List<int> adjacentIndexes = [];
-
+  handleAdjecenyIndexes({required int tapedIndex}) {
     // verifica se a posição acima existe e adiciona ao array
     if (tapedIndex > 5) {
-      adjacentIndexes.add(tapedIndex - 6);
       int pushedIndex = tapedIndex - 12;
       final Color currentColor = _cells[tapedIndex - 6];
 
@@ -469,7 +518,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
       // verifica se a posição à esquerda acima existe e adiciona ao array
       if (tapedIndex % 6 > 0) {
-        adjacentIndexes.add(tapedIndex - 7);
         int pushedIndex = tapedIndex - 14;
 
         if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -496,8 +544,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
       // verifica se a posição à direita acima existe e adiciona ao array
       if (tapedIndex % 6 < 5) {
-        adjacentIndexes.add(tapedIndex - 5);
-
         int pushedIndex = tapedIndex - 10;
 
         if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -523,7 +569,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
     // verifica se a posição à esquerda existe e adiciona ao array
     if (tapedIndex % 6 > 0) {
-      adjacentIndexes.add(tapedIndex - 1);
       int pushedIndex = tapedIndex - 2;
 
       if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -550,8 +595,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
     // verifica se a posição à direita existe e adiciona ao array
     if (tapedIndex % 6 < 5) {
-      adjacentIndexes.add(tapedIndex + 1);
-
       int pushedIndex = tapedIndex + 2;
 
       if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -578,7 +621,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
     // verifica se a posição abaixo existe e adiciona ao array
     if (tapedIndex < 30) {
-      adjacentIndexes.add(tapedIndex + 6);
       int pushedIndex = tapedIndex + 12;
       final Color currentColor = _cells[tapedIndex + 6];
 
@@ -598,7 +640,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
       // verifica se a posição à esquerda abaixo existe e adiciona ao array
       if (tapedIndex % 6 > 0) {
-        adjacentIndexes.add(tapedIndex + 5);
         int pushedIndex = tapedIndex + 10;
 
         if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -623,8 +664,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
       // verifica se a posição à direita abaixo existe e adiciona ao array
       if (tapedIndex % 6 < 5) {
-        adjacentIndexes.add(tapedIndex + 7);
-
         int pushedIndex = tapedIndex + 14;
 
         if (pushedIndex >= 0 && pushedIndex <= 35) {
@@ -648,10 +687,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
           );
         }
       }
-
-      // return adjacentIndexes;
     }
-
-    return adjacentIndexes;
   }
 }

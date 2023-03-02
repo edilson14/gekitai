@@ -5,5 +5,5 @@ class Messages {
   static String connected = 'Conectado ao Servidor!';
   static String givUpRequest = 'Solicitação enviada, aguarde!';
   static String winTheGame = 'Parabéns, você ganhou :)!';
-  static String loseByGivingUp = "Perdeu por desistencia! :'( ";
+  static String loseByGivingUp = "Perdeu o jogo! :'( ";
 }
