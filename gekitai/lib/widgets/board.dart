@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gekitai/enums/env.dart';
@@ -447,8 +445,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[pos] == _cells[pos + 1] &&
             _cells[pos] == _cells[pos + 2]) {
           _showVictory();
-          print(pos);
-          return _cells[pos];
         }
       }
     }
@@ -461,8 +457,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[pos] == _cells[pos + 6] &&
             _cells[pos] == _cells[pos + 12]) {
           _showVictory();
-          print(pos);
-          return _cells[pos];
         }
       }
     }
@@ -475,8 +469,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[pos] == _cells[pos + 7] &&
             _cells[pos] == _cells[pos + 14]) {
           _showVictory();
-          print(pos);
-          return _cells[pos];
         }
       }
     }
@@ -487,13 +479,9 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[pos] == _cells[pos + 5] &&
             _cells[pos] == _cells[pos + 10]) {
           _showVictory();
-          print(pos);
-          return _cells[pos];
         }
       }
     }
-
-    return 0; // No winner
   }
 
   handleAdjecenyIndexes({required int tapedIndex}) {
