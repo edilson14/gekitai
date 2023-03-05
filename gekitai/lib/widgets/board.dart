@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gekitai/enums/env.dart';
 import 'package:gekitai/enums/messages.dart';
+import 'package:gekitai/enums/sockt_events.dart';
 import 'package:gekitai/services/socket.dart';
+import 'package:gekitai/widgets/action_button.dart';
 import 'package:gekitai/widgets/gekitai_pieces.dart';
 
 const Color graycolor = Colors.grey;
@@ -57,7 +59,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
   void _handleComingMessage() {
     _client.socket.on(
-      'board-moviment',
+      SocketEvents.boardMoviment.event,
       (data) {
         if (_isNotFirstMoviment()) _hanldeTurn();
         List<dynamic> move =
@@ -71,9 +73,10 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
 
     _client.socket.on(
-      'piece-out-board',
+      SocketEvents.pieceOutBoard.event,
       (data) {
-        data = data.replaceAll('{', '').replaceAll('}', '').split(',');
+        data =
+            data.toString().replaceAll('{', '').replaceAll('}', '').split(',');
         final int color = int.parse(data[1]);
         final int boardPosition = int.parse(data[0].toString().trim());
         _cells[boardPosition] = graycolor;
@@ -89,14 +92,14 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
 
     _client.socket.on(
-      'give-up',
+      SocketEvents.giveUp.event,
       (data) {
         _showGivUpRequest();
       },
     );
 
     _client.socket.on(
-      'acept-give-up',
+      SocketEvents.aceptGiveUp.event,
       (data) {
         final SnackBar snackbar = SnackBar(
           content: Text(Messages.loseByGivingUp),
@@ -108,7 +111,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
 
     _client.socket.on(
-      'piece-was-pushed',
+      SocketEvents.pieceWasPushed.event,
       (data) {
         final List<String> positions =
             data.toString().replaceAll('[', '').replaceAll(']', '').split(',');
@@ -120,89 +123,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         _cells[to] = currentColor;
         setState(() {});
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 400,
-          width: 400,
-          child: GridView.count(
-            crossAxisCount: 6,
-            children: List.generate(_cells.length, (index) {
-              return GestureDetector(
-                onTap: () => _handlePlayerClick(tapedIndex: index),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.white,
-                    ),
-                    color: _cells[index],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: CherryBlossomPainter(),
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          index.toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        if (playerColor == null)
-          TextButton(
-            onPressed: () => _showColorPicker(),
-            child: const Text(
-              'Escolha uma cor',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        Row(
-          children: [
-            ...playersPieces.map((e) => e).toList(),
-          ],
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        if (playerColor != null)
-          TextButton(
-            onPressed: () {
-              final SnackBar snackbar = SnackBar(
-                content: Text(
-                  Messages.givUpRequest,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                backgroundColor: Colors.yellowAccent,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              _client.giveUp(playerColor: playerColor!);
-            },
-            child: const Text('Desistir'),
-          ),
-      ],
     );
   }
 
@@ -413,7 +333,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       backgroundColor: Colors.green,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    _client.socket.emit('acept-give-up', 1);
+    _client.socket.emit(SocketEvents.aceptGiveUp.event, 1);
     _resetTheBoard();
   }
 
@@ -676,5 +596,86 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
         }
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 400,
+          width: 400,
+          child: GridView.count(
+            crossAxisCount: 6,
+            children: List.generate(_cells.length, (index) {
+              return GestureDetector(
+                onTap: () => _handlePlayerClick(tapedIndex: index),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white,
+                    ),
+                    color: _cells[index],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: CherryBlossomPainter(),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          index.toString(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        if (playerColor == null)
+          ActionButton(
+            callBack: _showColorPicker,
+            textColor: Colors.red,
+            label: 'Escolha uma cor',
+          ),
+        Row(
+          children: [
+            ...playersPieces.map((e) => e).toList(),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        if (playerColor != null)
+          ActionButton(
+            callBack: _handleGivUp,
+            textColor: Colors.blueAccent,
+            label: 'Desistir',
+          )
+      ],
+    );
+  }
+
+  _handleGivUp() {
+    final SnackBar snackbar = SnackBar(
+      content: Text(
+        Messages.givUpRequest,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: Colors.yellowAccent,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    _client.giveUp(playerColor: playerColor!);
   }
 }

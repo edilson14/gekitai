@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:gekitai/enums/sockt_events.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class SocketClient {
@@ -19,18 +20,18 @@ class SocketClient {
   }
 
   sendMessage({required String message}) {
-    socket.emit('message', message);
+    socket.emit(SocketEvents.message.event, message);
   }
 
   sendBoardMove({required Color playerColor, required int boardIndex}) {
     Map<int, int> playerMove = {playerColor.value: boardIndex};
-    socket.emit('board-moviment', playerMove.toString());
+    socket.emit(SocketEvents.boardMoviment.event, playerMove.toString());
   }
 
   giveUp({
     required Color playerColor,
   }) {
-    socket.emit('give-up', playerColor.toString());
+    socket.emit(SocketEvents.giveUp.event, playerColor.toString());
   }
 
   playerPieceMovedOut({
@@ -38,7 +39,7 @@ class SocketClient {
     required int colorValue,
   }) {
     final socketData = {piecePosition, colorValue};
-    socket.emit('piece-out-board', socketData.toString());
+    socket.emit(SocketEvents.pieceOutBoard.event, socketData.toString());
   }
 
   pieceWasPushed({
@@ -46,6 +47,6 @@ class SocketClient {
     required int to,
   }) {
     final List<int> moviment = [from, to];
-    socket.emit('piece-was-pushed', moviment.toString());
+    socket.emit(SocketEvents.pieceWasPushed.event, moviment.toString());
   }
 }

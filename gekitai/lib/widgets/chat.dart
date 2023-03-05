@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gekitai/enums/mensagem.dart';
+import 'package:gekitai/enums/sockt_events.dart';
 import 'package:gekitai/services/socket.dart';
 
 class ChatClient extends StatefulWidget {
@@ -26,7 +27,7 @@ class _ChatClientState extends State<ChatClient> {
 
   void _handleReceviedMessages() {
     _client.socket.on(
-      'message',
+      SocketEvents.message.event,
       (message) {
         setState(
           () {
