@@ -8,28 +8,63 @@ const clients = [];
 
 io.on("connection", (socket) => {
   if (clients.length < 2) clients.push(socket);
-  console.log(`Total de clients ${clients.length}`);
 
   socket.on("message", (data) => {
-    console.log(`Message received from ${socket.id}: ${data}`);
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("message", `${data}`);
-      console.log(`Mensagem Enviada para ${otherClient.id} : ${data}`);
     }
   });
 
   socket.on("board-moviment", (data) => {
-    console.log(`Jogada do ${socket.id}: ${data}`);
     const otherClient = findClient(socket);
     if (otherClient !== undefined) {
       otherClient.emit("board-moviment", `${data}`);
-      console.log(`Jogada Enviada ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Peça movida para fora do tabuleiro
+  socket.on("piece-out-board", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("piece-out-board", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Jogador solicitou a desistencia
+  socket.on("give-up", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("give-up", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Jogador aceitou a desistencia
+  socket.on("acept-give-up", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("acept-give-up", `${data}`);
+      console.log(`Peça para fora ${otherClient.id} : ${data}`);
+    }
+  });
+
+  // Jogador aceitou a desistencia
+  socket.on("piece-was-pushed", (data) => {
+    const otherClient = findClient(socket);
+    if (otherClient !== undefined) {
+      otherClient.emit("piece-was-pushed", `${data}`);
+      console.log(`Peça empurrada ${otherClient.id} : ${data}`);
     }
   });
 
   socket.on("disconnect", () => {
-    console.log(`Client disconnected: ${socket.id}`);
+    const clientIndex = clients.findIndex(
+      (_client) => _client.id === socket.id
+    );
+    clients.splice(clientIndex, 1);
+    console.log(`Client desconectado: ${socket.id}`);
   });
 });
 

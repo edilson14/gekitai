@@ -7,7 +7,6 @@ void main() => runApp(const MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,15 +32,31 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          SizedBox(
-            height: 800,
-            width: 400,
-            child: ChatClient(),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromARGB(0, 99, 122, 204),
+                  Colors.brown.withOpacity(0.9)
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
           ),
-          GekitaiBoard()
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: const [
+              SizedBox(
+                height: 800,
+                width: 400,
+                child: ChatClient(),
+              ),
+              GekitaiBoard()
+            ],
+          ),
         ],
       ),
     );
