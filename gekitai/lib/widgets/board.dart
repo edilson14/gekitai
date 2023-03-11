@@ -1,8 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gekitai/enums/env.dart';
+import 'package:gekitai/enums/gekitaiclient/gekitai.pbgrpc.dart';
 import 'package:gekitai/enums/messages.dart';
-import 'package:gekitai/enums/sockt_events.dart';
 import 'package:gekitai/services/socket.dart';
 import 'package:gekitai/widgets/action_button.dart';
 import 'package:gekitai/widgets/gekitai_pieces.dart';
@@ -23,19 +25,11 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   final List<Color> _cells = List<Color>.filled(36, graycolor);
   final RMIClient _client = RMIClient();
   List<GekitaiPiece> playersPieces = [];
+  final clientId = Random().nextInt(10).toString();
 
   @override
   void initState() {
     super.initState();
-    // if (_client == true) {
-    //   _client.connect();
-    // } else {
-    //   final SnackBar snackbar = SnackBar(
-    //     content: Text(Messages.connected),
-    //     backgroundColor: Colors.green,
-    //   );
-    //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    // }
     _handleComingMessage();
   }
 
@@ -50,6 +44,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       _client.sendBoardMove(
         playerColor: playerColor!,
         boardIndex: tapedIndex,
+        clientId: clientId,
       );
       _pushPieces(tapedIndex: tapedIndex);
       _hanldeTurn();
@@ -58,19 +53,14 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _handleComingMessage() {
-    // _client.socket.on(
-    //   SocketEvents.boardMoviment.event,
-    //   (data) {
-    //     if (_isNotFirstMoviment()) _hanldeTurn();
-    //     List<dynamic> move =
-    //         data.toString().replaceAll('{', '').replaceAll('}', '').split(':');
-    //     setState(
-    //       () {
-    //         _cells[int.parse(move[1])] = Color(int.parse(move[0]));
-    //       },
-    //     );
-    //   },
-    // );
+    _client.gameStream.receiveMoviment(Empty()).listen((moviment) {
+      if (moviment.sender != clientId) {
+        if (_isNotFirstMoviment()) _hanldeTurn();
+        setState(() {
+          _cells[moviment.index] = Color(moviment.color.toInt());
+        });
+      }
+    });
 
     // _client.socket.on(
     //   SocketEvents.pieceOutBoard.event,

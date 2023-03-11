@@ -8,6 +8,18 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use movimentDescriptor instead')
+const Moviment$json = const {
+  '1': 'Moviment',
+  '2': const [
+    const {'1': 'color', '3': 1, '4': 1, '5': 3, '10': 'color'},
+    const {'1': 'index', '3': 2, '4': 1, '5': 5, '10': 'index'},
+    const {'1': 'sender', '3': 3, '4': 1, '5': 9, '10': 'sender'},
+  ],
+};
+
+/// Descriptor for `Moviment`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List movimentDescriptor = $convert.base64Decode('CghNb3ZpbWVudBIUCgVjb2xvchgBIAEoA1IFY29sb3ISFAoFaW5kZXgYAiABKAVSBWluZGV4EhYKBnNlbmRlchgDIAEoCVIGc2VuZGVy');
 @$core.Deprecated('Use messageDescriptor instead')
 const Message$json = const {
   '1': 'Message',

@@ -1,3 +1,5 @@
+import 'package:fixnum/fixnum.dart';
+
 import 'package:flutter/services.dart';
 import 'package:gekitai/enums/gekitaiclient/gekitai.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
@@ -35,8 +37,18 @@ class RMIClient {
     gameStream.sendMessage(message);
   }
 
-  sendBoardMove({required Color playerColor, required int boardIndex}) {
-    Map<int, int> playerMove = {playerColor.value: boardIndex};
+  sendBoardMove({
+    required Color playerColor,
+    required int boardIndex,
+    required String clientId,
+  }) {
+    dynamic color = playerColor.value.toUnsigned(64);
+    final Moviment moviment = Moviment(
+      color: Int64(color),
+      index: boardIndex,
+      sender: clientId,
+    );
+    gameStream.sendMoviment(moviment);
   }
 
   giveUp({
