@@ -1,45 +1,53 @@
 import 'package:flutter/services.dart';
-import 'package:gekitai/enums/sockt_events.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'package:gekitai/enums/gekitaiclient/gekitai.pbgrpc.dart';
+import 'package:grpc/grpc.dart';
 
-class SocketClient {
-  static final SocketClient _socketClient = SocketClient._internal();
-  io.Socket socket = io.io('http://localhost:3000', {
-    'autoConnect': false,
-    'transports': ['websocket'],
-  });
+class RMIClient {
+  static final RMIClient _gRCPClient = RMIClient._internal();
+  var channel = ClientChannel(
+    'localhost',
+    port: 3000,
+    options: const ChannelOptions(
+      credentials: ChannelCredentials.insecure(),
+    ),
+  );
 
-  SocketClient._internal();
-  factory SocketClient() {
-    return _socketClient;
+  var gameStream = GekitaiClient(
+    ClientChannel(
+      'localhost',
+      port: 3000,
+      options: const ChannelOptions(
+        credentials: ChannelCredentials.insecure(),
+      ),
+    ),
+  );
+
+  RMIClient._internal();
+  factory RMIClient() {
+    return _gRCPClient;
   }
 
-  connect() {
-    socket.connect();
-    socket.onConnectError((data) {});
-  }
-
-  sendMessage({required String message}) {
-    socket.emit(SocketEvents.message.event, message);
+  sendMessage({required String messageText, required String clientId}) {
+    final Message message = Message();
+    message.isSent = true;
+    message.text = messageText;
+    message.sender = clientId;
+    gameStream.sendMessage(message);
   }
 
   sendBoardMove({required Color playerColor, required int boardIndex}) {
     Map<int, int> playerMove = {playerColor.value: boardIndex};
-    socket.emit(SocketEvents.boardMoviment.event, playerMove.toString());
   }
 
   giveUp({
     required Color playerColor,
-  }) {
-    socket.emit(SocketEvents.giveUp.event, playerColor.toString());
-  }
+  }) {}
 
   playerPieceMovedOut({
     required int piecePosition,
     required int colorValue,
   }) {
     final socketData = {piecePosition, colorValue};
-    socket.emit(SocketEvents.pieceOutBoard.event, socketData.toString());
   }
 
   pieceWasPushed({
@@ -47,6 +55,5 @@ class SocketClient {
     required int to,
   }) {
     final List<int> moviment = [from, to];
-    socket.emit(SocketEvents.pieceWasPushed.event, moviment.toString());
   }
 }

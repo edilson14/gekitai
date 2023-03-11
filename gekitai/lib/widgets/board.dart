@@ -21,21 +21,21 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   Color? playerColor;
   final Color _currentColor = graycolor;
   final List<Color> _cells = List<Color>.filled(36, graycolor);
-  final SocketClient _client = SocketClient();
+  final RMIClient _client = RMIClient();
   List<GekitaiPiece> playersPieces = [];
 
   @override
   void initState() {
     super.initState();
-    if (_client.socket.disconnected) {
-      _client.connect();
-    } else {
-      final SnackBar snackbar = SnackBar(
-        content: Text(Messages.connected),
-        backgroundColor: Colors.green,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    }
+    // if (_client == true) {
+    //   _client.connect();
+    // } else {
+    //   final SnackBar snackbar = SnackBar(
+    //     content: Text(Messages.connected),
+    //     backgroundColor: Colors.green,
+    //   );
+    //   ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    // }
     _handleComingMessage();
   }
 
@@ -58,72 +58,72 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _handleComingMessage() {
-    _client.socket.on(
-      SocketEvents.boardMoviment.event,
-      (data) {
-        if (_isNotFirstMoviment()) _hanldeTurn();
-        List<dynamic> move =
-            data.toString().replaceAll('{', '').replaceAll('}', '').split(':');
-        setState(
-          () {
-            _cells[int.parse(move[1])] = Color(int.parse(move[0]));
-          },
-        );
-      },
-    );
+    // _client.socket.on(
+    //   SocketEvents.boardMoviment.event,
+    //   (data) {
+    //     if (_isNotFirstMoviment()) _hanldeTurn();
+    //     List<dynamic> move =
+    //         data.toString().replaceAll('{', '').replaceAll('}', '').split(':');
+    //     setState(
+    //       () {
+    //         _cells[int.parse(move[1])] = Color(int.parse(move[0]));
+    //       },
+    //     );
+    //   },
+    // );
 
-    _client.socket.on(
-      SocketEvents.pieceOutBoard.event,
-      (data) {
-        data =
-            data.toString().replaceAll('{', '').replaceAll('}', '').split(',');
-        final int color = int.parse(data[1]);
-        final int boardPosition = int.parse(data[0].toString().trim());
-        _cells[boardPosition] = graycolor;
-        if (color == playerColor?.value) {
-          playersPieces.add(
-            GekitaiPiece(
-              color: playerColor!,
-            ),
-          );
-        }
-        setState(() {});
-      },
-    );
+    // _client.socket.on(
+    //   SocketEvents.pieceOutBoard.event,
+    //   (data) {
+    //     data =
+    //         data.toString().replaceAll('{', '').replaceAll('}', '').split(',');
+    //     final int color = int.parse(data[1]);
+    //     final int boardPosition = int.parse(data[0].toString().trim());
+    //     _cells[boardPosition] = graycolor;
+    //     if (color == playerColor?.value) {
+    //       playersPieces.add(
+    //         GekitaiPiece(
+    //           color: playerColor!,
+    //         ),
+    //       );
+    //     }
+    //     setState(() {});
+    //   },
+    // );
 
-    _client.socket.on(
-      SocketEvents.giveUp.event,
-      (data) {
-        _showGivUpRequest();
-      },
-    );
+    // _client.socket.on(
+    //   SocketEvents.giveUp.event,
+    //   (data) {
+    //     _showGivUpRequest();
+    //   },
+    // );
 
-    _client.socket.on(
-      SocketEvents.aceptGiveUp.event,
-      (data) {
-        final SnackBar snackbar = SnackBar(
-          content: Text(Messages.loseByGivingUp),
-          backgroundColor: Colors.red,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackbar);
-        _resetTheBoard();
-      },
-    );
+    // _client.socket.on(
+    //   SocketEvents.aceptGiveUp.event,
+    //   (data) {
+    //     final SnackBar snackbar = SnackBar(
+    //       content: Text(Messages.loseByGivingUp),
+    //       backgroundColor: Colors.red,
+    //     );
+    //     ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    //     _resetTheBoard();
+    //   },
+    // );
 
-    _client.socket.on(
-      SocketEvents.pieceWasPushed.event,
-      (data) {
-        final List<String> positions =
-            data.toString().replaceAll('[', '').replaceAll(']', '').split(',');
-        int from = int.parse(positions[0]);
-        int to = int.parse(positions[1]);
+    // _client.socket.on(
+    //   SocketEvents.pieceWasPushed.event,
+    //   (data) {
+    //     final List<String> positions =
+    //         data.toString().replaceAll('[', '').replaceAll(']', '').split(',');
+    //     int from = int.parse(positions[0]);
+    //     int to = int.parse(positions[1]);
 
-        final Color currentColor = _cells[from];
-        _cells[from] = graycolor;
-        _cells[to] = currentColor;
-        setState(() {});
-      },
-    );
+    //     final Color currentColor = _cells[from];
+    //     _cells[from] = graycolor;
+    //     _cells[to] = currentColor;
+    //     setState(() {});
+    //   },
+    // );
   }
 
   void _showColorPicker() async {
@@ -333,7 +333,7 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
       backgroundColor: Colors.green,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-    _client.socket.emit(SocketEvents.aceptGiveUp.event, 1);
+    // _client.socket.emit(SocketEvents.aceptGiveUp.event, 1);
     _resetTheBoard();
   }
 

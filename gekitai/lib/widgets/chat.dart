@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gekitai/enums/gekitaiclient/gekitai.pb.dart';
 import 'package:gekitai/enums/mensagem.dart';
-import 'package:gekitai/enums/sockt_events.dart';
 import 'package:gekitai/services/socket.dart';
+import 'dart:math';
 
 class ChatClient extends StatefulWidget {
   const ChatClient({
@@ -14,33 +15,29 @@ class ChatClient extends StatefulWidget {
 
 class _ChatClientState extends State<ChatClient> {
   final TextEditingController _textController = TextEditingController();
-  final _client = SocketClient();
+  final _client = RMIClient();
   final FocusNode _messageFocusNode = FocusNode();
   List<Mensagem> mensagens = [];
+  final clientId = Random().nextInt(10).toString();
 
   @override
   void initState() {
-    _client.connect();
     _handleReceviedMessages();
     super.initState();
   }
 
   void _handleReceviedMessages() {
-    _client.socket.on(
-      SocketEvents.message.event,
-      (message) {
-        setState(
-          () {
-            mensagens.add(
-              Mensagem(
-                mensagem: message,
-                isSent: false,
-              ),
-            );
-          },
+    _client.gameStream.receiveMessages(Empty()).listen((value) {
+      if (value.sender != clientId) {
+        mensagens.add(
+          Mensagem(
+            mensagem: value.text,
+            isSent: false,
+          ),
         );
-      },
-    );
+      }
+      setState(() {});
+    });
   }
 
   @override
@@ -145,7 +142,10 @@ class _ChatClientState extends State<ChatClient> {
       mensagens.add(
         Mensagem(mensagem: _textController.text),
       );
-      _client.sendMessage(message: _textController.text);
+      _client.sendMessage(
+        messageText: _textController.text,
+        clientId: clientId,
+      );
       _textController.clear();
       _messageFocusNode.requestFocus();
       setState(() {});
