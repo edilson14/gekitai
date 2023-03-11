@@ -10,6 +10,81 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class PieceWasPushed extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PieceWasPushed', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'chat'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'from', $pb.PbFieldType.O3)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'to', $pb.PbFieldType.O3)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sender')
+    ..hasRequiredFields = false
+  ;
+
+  PieceWasPushed._() : super();
+  factory PieceWasPushed({
+    $core.int? from,
+    $core.int? to,
+    $core.String? sender,
+  }) {
+    final _result = create();
+    if (from != null) {
+      _result.from = from;
+    }
+    if (to != null) {
+      _result.to = to;
+    }
+    if (sender != null) {
+      _result.sender = sender;
+    }
+    return _result;
+  }
+  factory PieceWasPushed.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory PieceWasPushed.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  PieceWasPushed clone() => PieceWasPushed()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  PieceWasPushed copyWith(void Function(PieceWasPushed) updates) => super.copyWith((message) => updates(message as PieceWasPushed)) as PieceWasPushed; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static PieceWasPushed create() => PieceWasPushed._();
+  PieceWasPushed createEmptyInstance() => create();
+  static $pb.PbList<PieceWasPushed> createRepeated() => $pb.PbList<PieceWasPushed>();
+  @$core.pragma('dart2js:noInline')
+  static PieceWasPushed getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PieceWasPushed>(create);
+  static PieceWasPushed? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get from => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set from($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasFrom() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearFrom() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get to => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set to($core.int v) { $_setSignedInt32(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasTo() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTo() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get sender => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set sender($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSender() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSender() => clearField(3);
+}
+
 class Moviment extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Moviment', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'chat'), createEmptyInstance: create)
     ..aInt64(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'color')

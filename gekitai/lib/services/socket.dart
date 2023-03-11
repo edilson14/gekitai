@@ -65,7 +65,10 @@ class RMIClient {
   pieceWasPushed({
     required int from,
     required int to,
+    required String clientId,
   }) {
-    final List<int> moviment = [from, to];
+    final PieceWasPushed push =
+        PieceWasPushed(from: from, to: to, sender: clientId);
+    gameStream.sendPiecePushed(push);
   }
 }

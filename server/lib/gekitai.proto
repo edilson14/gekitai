@@ -9,7 +9,18 @@ service Gekitai {
   rpc SendMoviment(Moviment) returns (Empty);
   rpc ReceiveMoviment(Empty) returns (stream Moviment);
 
+
+  rpc SendPiecePushed(PieceWasPushed) returns (Empty);
+  rpc RecievePiecePushed(Empty) returns (stream PieceWasPushed);
+
 }
+// movimento de empurão de peças
+message PieceWasPushed{
+  int32 from = 1;
+  int32 to = 2;
+  string sender =3;
+}
+
 
 //jogadas
 message Moviment {

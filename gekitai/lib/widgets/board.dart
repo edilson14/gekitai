@@ -53,15 +53,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
   }
 
   void _handleComingMessage() {
-    _client.gameStream.receiveMoviment(Empty()).listen((moviment) {
-      if (moviment.sender != clientId) {
-        if (_isNotFirstMoviment()) _hanldeTurn();
-        setState(() {
-          _cells[moviment.index] = Color(moviment.color.toInt());
-        });
-      }
-    });
-
+    _handleMoviment();
+    _handlePushes();
     // _client.socket.on(
     //   SocketEvents.pieceOutBoard.event,
     //   (data) {
@@ -97,21 +90,6 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     //     );
     //     ScaffoldMessenger.of(context).showSnackBar(snackbar);
     //     _resetTheBoard();
-    //   },
-    // );
-
-    // _client.socket.on(
-    //   SocketEvents.pieceWasPushed.event,
-    //   (data) {
-    //     final List<String> positions =
-    //         data.toString().replaceAll('[', '').replaceAll(']', '').split(',');
-    //     int from = int.parse(positions[0]);
-    //     int to = int.parse(positions[1]);
-
-    //     final Color currentColor = _cells[from];
-    //     _cells[from] = graycolor;
-    //     _cells[to] = currentColor;
-    //     setState(() {});
     //   },
     // );
   }
@@ -405,7 +383,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[tapedIndex - 12] == graycolor) {
           _cells[tapedIndex - 6] = graycolor;
           _cells[tapedIndex - 12] = currentColor;
-          _client.pieceWasPushed(from: tapedIndex - 6, to: tapedIndex - 12);
+          _client.pieceWasPushed(
+              clientId: clientId, from: tapedIndex - 6, to: tapedIndex - 12);
         }
       } else {
         handlePieceOut(
@@ -429,7 +408,10 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             } else {
               // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
               _cells[tapedIndex - 14] = currentColor;
-              _client.pieceWasPushed(from: tapedIndex - 7, to: tapedIndex - 14);
+              _client.pieceWasPushed(
+                  clientId: clientId,
+                  from: tapedIndex - 7,
+                  to: tapedIndex - 14);
             }
           }
         } else {
@@ -454,7 +436,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
             // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
             _cells[tapedIndex - 10] = currentColor;
-            _client.pieceWasPushed(from: tapedIndex - 5, to: tapedIndex - 10);
+            _client.pieceWasPushed(
+                clientId: clientId, from: tapedIndex - 5, to: tapedIndex - 10);
           }
         } else {
           handlePieceOut(
@@ -480,7 +463,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
           } else {
             // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
             _cells[tapedIndex - 2] = currentColor;
-            _client.pieceWasPushed(from: tapedIndex - 1, to: tapedIndex - 2);
+            _client.pieceWasPushed(
+                clientId: clientId, from: tapedIndex - 1, to: tapedIndex - 2);
           }
         }
       } else {
@@ -506,7 +490,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
           } else {
             // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
             _cells[tapedIndex + 2] = currentColor;
-            _client.pieceWasPushed(from: tapedIndex + 1, to: tapedIndex + 2);
+            _client.pieceWasPushed(
+                clientId: clientId, from: tapedIndex + 1, to: tapedIndex + 2);
           }
         }
       } else {
@@ -527,7 +512,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             _cells[tapedIndex + 12] == graycolor) {
           _cells[tapedIndex + 6] = graycolor;
           _cells[tapedIndex + 12] = currentColor;
-          _client.pieceWasPushed(from: tapedIndex + 6, to: tapedIndex + 12);
+          _client.pieceWasPushed(
+              clientId: clientId, from: tapedIndex + 6, to: tapedIndex + 12);
         }
       } else {
         handlePieceOut(
@@ -550,7 +536,8 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
 
             // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
             _cells[tapedIndex + 10] = currentColor;
-            _client.pieceWasPushed(from: tapedIndex + 5, to: tapedIndex + 10);
+            _client.pieceWasPushed(
+                clientId: clientId, from: tapedIndex + 5, to: tapedIndex + 10);
           }
         } else {
           handlePieceOut(
@@ -575,7 +562,10 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
             } else {
               // Verifica se a posição para onde a peça deve ser empurrada está fora do tabuleiro
               _cells[tapedIndex + 14] = currentColor;
-              _client.pieceWasPushed(from: tapedIndex + 7, to: tapedIndex + 14);
+              _client.pieceWasPushed(
+                  clientId: clientId,
+                  from: tapedIndex + 7,
+                  to: tapedIndex + 14);
             }
           }
         } else {
@@ -667,5 +657,27 @@ class _GekitaiBoardState extends State<GekitaiBoard> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
     _client.giveUp(playerColor: playerColor!);
+  }
+
+  _handleMoviment() {
+    _client.gameStream.receiveMoviment(Empty()).listen((moviment) {
+      if (moviment.sender != clientId) {
+        if (_isNotFirstMoviment()) _hanldeTurn();
+        setState(() {
+          _cells[moviment.index] = Color(moviment.color.toInt());
+        });
+      }
+    });
+  }
+
+  _handlePushes() {
+    _client.gameStream.recievePiecePushed(Empty()).listen((push) {
+      if (push.sender != clientId) {
+        final Color currentColor = _cells[push.from];
+        _cells[push.from] = graycolor;
+        _cells[push.to] = currentColor;
+        setState(() {});
+      }
+    });
   }
 }

@@ -4,6 +4,7 @@ import 'package:server/gekitaiclient/lib/gekitai.pbgrpc.dart';
 class GekitaiServices extends GekitaiServiceBase {
   final _messages = <Message>[];
   final _moviments = <Moviment>[];
+  final _pushes = <PieceWasPushed>[];
 
   @override
   Future<Empty> sendMessage(ServiceCall call, Message request) async {
@@ -41,6 +42,32 @@ class GekitaiServices extends GekitaiServiceBase {
         if (!seenMoviments.contains(moviment)) {
           seenMoviments.add(moviment);
           yield moviment;
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 100));
+    }
+  }
+
+  @override
+  Future<Empty> sendPiecePushed(
+    ServiceCall call,
+    PieceWasPushed request,
+  ) async {
+    _pushes.add(request);
+    return Empty();
+  }
+
+  @override
+  Stream<PieceWasPushed> recievePiecePushed(
+    ServiceCall call,
+    Empty request,
+  ) async* {
+    final seenPushes = <PieceWasPushed>{};
+    while (true) {
+      for (final push in _pushes) {
+        if (!seenPushes.contains(push)) {
+          seenPushes.add(push);
+          yield push;
         }
       }
       await Future.delayed(Duration(milliseconds: 100));

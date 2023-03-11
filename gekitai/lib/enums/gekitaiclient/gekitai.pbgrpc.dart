@@ -30,6 +30,16 @@ class GekitaiClient extends $grpc.Client {
       '/chat.Gekitai/ReceiveMoviment',
       ($0.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Moviment.fromBuffer(value));
+  static final _$sendPiecePushed =
+      $grpc.ClientMethod<$0.PieceWasPushed, $0.Empty>(
+          '/chat.Gekitai/SendPiecePushed',
+          ($0.PieceWasPushed value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.Empty.fromBuffer(value));
+  static final _$recievePiecePushed =
+      $grpc.ClientMethod<$0.Empty, $0.PieceWasPushed>(
+          '/chat.Gekitai/RecievePiecePushed',
+          ($0.Empty value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.PieceWasPushed.fromBuffer(value));
 
   GekitaiClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -57,6 +67,18 @@ class GekitaiClient extends $grpc.Client {
       {$grpc.CallOptions? options}) {
     return $createStreamingCall(
         _$receiveMoviment, $async.Stream.fromIterable([request]),
+        options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Empty> sendPiecePushed($0.PieceWasPushed request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$sendPiecePushed, request, options: options);
+  }
+
+  $grpc.ResponseStream<$0.PieceWasPushed> recievePiecePushed($0.Empty request,
+      {$grpc.CallOptions? options}) {
+    return $createStreamingCall(
+        _$recievePiecePushed, $async.Stream.fromIterable([request]),
         options: options);
   }
 }
@@ -93,6 +115,20 @@ abstract class GekitaiServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
         ($0.Moviment value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.PieceWasPushed, $0.Empty>(
+        'SendPiecePushed',
+        sendPiecePushed_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.PieceWasPushed.fromBuffer(value),
+        ($0.Empty value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.PieceWasPushed>(
+        'RecievePiecePushed',
+        recievePiecePushed_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
+        ($0.PieceWasPushed value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.Empty> sendMessage_Pre(
@@ -115,6 +151,16 @@ abstract class GekitaiServiceBase extends $grpc.Service {
     yield* receiveMoviment(call, await request);
   }
 
+  $async.Future<$0.Empty> sendPiecePushed_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.PieceWasPushed> request) async {
+    return sendPiecePushed(call, await request);
+  }
+
+  $async.Stream<$0.PieceWasPushed> recievePiecePushed_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
+    yield* recievePiecePushed(call, await request);
+  }
+
   $async.Future<$0.Empty> sendMessage(
       $grpc.ServiceCall call, $0.Message request);
   $async.Stream<$0.Message> receiveMessages(
@@ -122,5 +168,9 @@ abstract class GekitaiServiceBase extends $grpc.Service {
   $async.Future<$0.Empty> sendMoviment(
       $grpc.ServiceCall call, $0.Moviment request);
   $async.Stream<$0.Moviment> receiveMoviment(
+      $grpc.ServiceCall call, $0.Empty request);
+  $async.Future<$0.Empty> sendPiecePushed(
+      $grpc.ServiceCall call, $0.PieceWasPushed request);
+  $async.Stream<$0.PieceWasPushed> recievePiecePushed(
       $grpc.ServiceCall call, $0.Empty request);
 }
