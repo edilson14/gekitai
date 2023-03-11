@@ -1,4 +1,4 @@
-# gekitai_socket
+# gekitai
 jogo gekitai implementado utilizando tecnologia socket
 
 
