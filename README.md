@@ -1,5 +1,5 @@
-# gekitai_socket
-jogo gekitai implementado utilizando tecnologia gRCP
+# gekitai
+jogo gekitai implementado utilizando tecnologia RMI/gRCP
 
 
 # Requisitos 
