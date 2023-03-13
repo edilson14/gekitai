@@ -20,6 +20,18 @@ const PieceWasPushed$json = const {
 
 /// Descriptor for `PieceWasPushed`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List pieceWasPushedDescriptor = $convert.base64Decode('Cg5QaWVjZVdhc1B1c2hlZBISCgRmcm9tGAEgASgFUgRmcm9tEg4KAnRvGAIgASgFUgJ0bxIWCgZzZW5kZXIYAyABKAlSBnNlbmRlcg==');
+@$core.Deprecated('Use pieceOutBoardDescriptor instead')
+const PieceOutBoard$json = const {
+  '1': 'PieceOutBoard',
+  '2': const [
+    const {'1': 'boardPosition', '3': 1, '4': 1, '5': 5, '10': 'boardPosition'},
+    const {'1': 'color', '3': 2, '4': 1, '5': 3, '10': 'color'},
+    const {'1': 'sender', '3': 3, '4': 1, '5': 9, '10': 'sender'},
+  ],
+};
+
+/// Descriptor for `PieceOutBoard`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pieceOutBoardDescriptor = $convert.base64Decode('Cg1QaWVjZU91dEJvYXJkEiQKDWJvYXJkUG9zaXRpb24YASABKAVSDWJvYXJkUG9zaXRpb24SFAoFY29sb3IYAiABKANSBWNvbG9yEhYKBnNlbmRlchgDIAEoCVIGc2VuZGVy');
 @$core.Deprecated('Use movimentDescriptor instead')
 const Moviment$json = const {
   '1': 'Moviment',

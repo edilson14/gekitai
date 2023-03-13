@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gekitai/enums/gekitaiclient/gekitai.pb.dart';
 import 'package:gekitai/enums/mensagem.dart';
-import 'package:gekitai/services/socket.dart';
+import 'package:gekitai/services/grcp.dart';
 import 'dart:math';
 
 class ChatClient extends StatefulWidget {
@@ -15,7 +15,7 @@ class ChatClient extends StatefulWidget {
 
 class _ChatClientState extends State<ChatClient> {
   final TextEditingController _textController = TextEditingController();
-  final _client = RMIClient();
+  final _client = GRCPClien();
   final FocusNode _messageFocusNode = FocusNode();
   List<Mensagem> mensagens = [];
   final clientId = Random().nextInt(10).toString();
@@ -35,8 +35,8 @@ class _ChatClientState extends State<ChatClient> {
             isSent: false,
           ),
         );
+        setState(() {});
       }
-      setState(() {});
     });
   }
 

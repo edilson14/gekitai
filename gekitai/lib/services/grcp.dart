@@ -4,15 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:gekitai/enums/gekitaiclient/gekitai.pbgrpc.dart';
 import 'package:grpc/grpc.dart';
 
-class RMIClient {
-  static final RMIClient _gRCPClient = RMIClient._internal();
-  var channel = ClientChannel(
-    'localhost',
-    port: 3000,
-    options: const ChannelOptions(
-      credentials: ChannelCredentials.insecure(),
-    ),
-  );
+class GRCPClien {
+  static final GRCPClien _gRCPClient = GRCPClien._internal();
 
   var gameStream = GekitaiClient(
     ClientChannel(
@@ -24,8 +17,8 @@ class RMIClient {
     ),
   );
 
-  RMIClient._internal();
-  factory RMIClient() {
+  GRCPClien._internal();
+  factory GRCPClien() {
     return _gRCPClient;
   }
 
@@ -52,14 +45,24 @@ class RMIClient {
   }
 
   giveUp({
-    required Color playerColor,
-  }) {}
+    required String clientId,
+  }) {
+    gameStream.sendGiveUP(
+      Empty(sender: clientId),
+    );
+  }
 
   playerPieceMovedOut({
     required int piecePosition,
     required int colorValue,
+    required String clientID,
   }) {
-    final socketData = {piecePosition, colorValue};
+    PieceOutBoard pieceOutBoard = PieceOutBoard(
+      boardPosition: piecePosition,
+      color: Int64(colorValue),
+      sender: clientID,
+    );
+    gameStream.sendPieceOutBoard(pieceOutBoard);
   }
 
   pieceWasPushed({

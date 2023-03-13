@@ -85,6 +85,81 @@ class PieceWasPushed extends $pb.GeneratedMessage {
   void clearSender() => clearField(3);
 }
 
+class PieceOutBoard extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PieceOutBoard', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'chat'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'boardPosition', $pb.PbFieldType.O3, protoName: 'boardPosition')
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'color')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sender')
+    ..hasRequiredFields = false
+  ;
+
+  PieceOutBoard._() : super();
+  factory PieceOutBoard({
+    $core.int? boardPosition,
+    $fixnum.Int64? color,
+    $core.String? sender,
+  }) {
+    final _result = create();
+    if (boardPosition != null) {
+      _result.boardPosition = boardPosition;
+    }
+    if (color != null) {
+      _result.color = color;
+    }
+    if (sender != null) {
+      _result.sender = sender;
+    }
+    return _result;
+  }
+  factory PieceOutBoard.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory PieceOutBoard.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  PieceOutBoard clone() => PieceOutBoard()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  PieceOutBoard copyWith(void Function(PieceOutBoard) updates) => super.copyWith((message) => updates(message as PieceOutBoard)) as PieceOutBoard; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static PieceOutBoard create() => PieceOutBoard._();
+  PieceOutBoard createEmptyInstance() => create();
+  static $pb.PbList<PieceOutBoard> createRepeated() => $pb.PbList<PieceOutBoard>();
+  @$core.pragma('dart2js:noInline')
+  static PieceOutBoard getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PieceOutBoard>(create);
+  static PieceOutBoard? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get boardPosition => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set boardPosition($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasBoardPosition() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearBoardPosition() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get color => $_getI64(1);
+  @$pb.TagNumber(2)
+  set color($fixnum.Int64 v) { $_setInt64(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasColor() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearColor() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get sender => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set sender($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSender() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSender() => clearField(3);
+}
+
 class Moviment extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Moviment', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'chat'), createEmptyInstance: create)
     ..aInt64(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'color')

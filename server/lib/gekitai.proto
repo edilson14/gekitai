@@ -13,12 +13,24 @@ service Gekitai {
   rpc SendPiecePushed(PieceWasPushed) returns (Empty);
   rpc RecievePiecePushed(Empty) returns (stream PieceWasPushed);
 
+  rpc SendPieceOutBoard(PieceOutBoard) returns (Empty);
+  rpc RecievePieceOutBoard(Empty) returns (stream PieceOutBoard);
+
+  rpc SendGiveUP(Empty) returns (Empty);
+  rpc RecieveGivUp(Empty) returns (stream Empty);
+
 }
 // movimento de empurão de peças
 message PieceWasPushed{
   int32 from = 1;
   int32 to = 2;
   string sender =3;
+}
+
+message PieceOutBoard{
+  int32 boardPosition = 1;
+  int64 color= 2;
+  string sender = 3;
 }
 
 
