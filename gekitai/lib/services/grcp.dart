@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fixnum/fixnum.dart';
 
 import 'package:flutter/services.dart';
@@ -6,6 +8,8 @@ import 'package:grpc/grpc.dart';
 
 class GRCPClien {
   static final GRCPClien _gRCPClient = GRCPClien._internal();
+
+  final clientId = Random().nextInt(10).toString();
 
   var gameStream = GekitaiClient(
     ClientChannel(
@@ -22,7 +26,7 @@ class GRCPClien {
     return _gRCPClient;
   }
 
-  sendMessage({required String messageText, required String clientId}) {
+  sendMessage({required String messageText}) {
     final Message message = Message();
     message.isSent = true;
     message.text = messageText;
@@ -33,7 +37,6 @@ class GRCPClien {
   sendBoardMove({
     required Color playerColor,
     required int boardIndex,
-    required String clientId,
   }) {
     dynamic color = playerColor.value.toUnsigned(64);
     final Moviment moviment = Moviment(
@@ -44,9 +47,7 @@ class GRCPClien {
     gameStream.sendMoviment(moviment);
   }
 
-  giveUp({
-    required String clientId,
-  }) {
+  giveUp() {
     gameStream.sendGiveUP(
       Empty(sender: clientId),
     );
@@ -55,12 +56,11 @@ class GRCPClien {
   playerPieceMovedOut({
     required int piecePosition,
     required int colorValue,
-    required String clientID,
   }) {
     PieceOutBoard pieceOutBoard = PieceOutBoard(
       boardPosition: piecePosition,
       color: Int64(colorValue),
-      sender: clientID,
+      sender: clientId,
     );
     gameStream.sendPieceOutBoard(pieceOutBoard);
   }
@@ -68,10 +68,13 @@ class GRCPClien {
   pieceWasPushed({
     required int from,
     required int to,
-    required String clientId,
   }) {
     final PieceWasPushed push =
         PieceWasPushed(from: from, to: to, sender: clientId);
     gameStream.sendPiecePushed(push);
+  }
+
+  accepGiveUp() {
+    gameStream.sendAcceptGiveUP(Empty(sender: clientId));
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gekitai/enums/gekitaiclient/gekitai.pb.dart';
 import 'package:gekitai/enums/mensagem.dart';
 import 'package:gekitai/services/grcp.dart';
-import 'dart:math';
 
 class ChatClient extends StatefulWidget {
   const ChatClient({
@@ -18,7 +17,6 @@ class _ChatClientState extends State<ChatClient> {
   final _client = GRCPClien();
   final FocusNode _messageFocusNode = FocusNode();
   List<Mensagem> mensagens = [];
-  final clientId = Random().nextInt(10).toString();
 
   @override
   void initState() {
@@ -28,7 +26,7 @@ class _ChatClientState extends State<ChatClient> {
 
   void _handleReceviedMessages() {
     _client.gameStream.receiveMessages(Empty()).listen((value) {
-      if (value.sender != clientId) {
+      if (value.sender != _client.clientId) {
         mensagens.add(
           Mensagem(
             mensagem: value.text,
@@ -144,7 +142,6 @@ class _ChatClientState extends State<ChatClient> {
       );
       _client.sendMessage(
         messageText: _textController.text,
-        clientId: clientId,
       );
       _textController.clear();
       _messageFocusNode.requestFocus();
