@@ -7,6 +7,7 @@ class GekitaiServices extends GekitaiServiceBase {
   final _pushes = <PieceWasPushed>[];
   final _piecesOut = <PieceOutBoard>[];
   final _giveUps = <Empty>[];
+  final _acceptGiveUps = <Empty>[];
 
   @override
   Future<Empty> sendMessage(ServiceCall call, Message request) async {
@@ -118,6 +119,38 @@ class GekitaiServices extends GekitaiServiceBase {
       }
       await Future.delayed(Duration(milliseconds: 100));
     }
+  }
+
+  @override
+  Future<Empty> sendAcceptGiveUP(ServiceCall call, Empty request) async {
+    _acceptGiveUps.add(request);
+    return Empty();
+  }
+
+  @override
+  Stream<Empty> recieveAcceptGivUp(ServiceCall call, Empty request) async* {
+    final seenAccepsgiveUps = <Empty>{};
+    while (true) {
+      for (final giveUp in _acceptGiveUps) {
+        if (!seenAccepsgiveUps.contains(giveUp)) {
+          seenAccepsgiveUps.add(giveUp);
+          yield giveUp;
+        }
+      }
+      await Future.delayed(Duration(milliseconds: 100));
+      // .then(
+      //     // (value) => _resetValues(),
+      //     );
+    }
+  }
+
+  void _resetValues() {
+    _messages.clear();
+    _moviments.clear();
+    _pushes.clear();
+    _piecesOut.clear();
+    _giveUps.clear();
+    _acceptGiveUps.clear();
   }
 }
 

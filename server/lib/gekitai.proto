@@ -19,6 +19,9 @@ service Gekitai {
   rpc SendGiveUP(Empty) returns (Empty);
   rpc RecieveGivUp(Empty) returns (stream Empty);
 
+  rpc SendAcceptGiveUP(Empty) returns (Empty);
+  rpc RecieveAcceptGivUp(Empty) returns (stream Empty);
+
 }
 // movimento de empurão de peças
 message PieceWasPushed{
